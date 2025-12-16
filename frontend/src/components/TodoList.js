@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaTrash, FaCheck, FaSignOutAlt, FaPlus, FaClipboardList, FaCoffee} from 'react-icons/fa'; // React Icons
+import { FaTrash, FaCheck, FaSignOutAlt, FaPlus, FaClipboardList, FaCoffee} from 'react-icons/fa';
 
 const CEI_LOGO_URL = "https://cei.kmitl.ac.th/wp-content/uploads/2024/09/cropped-ceip-fav-1.png"; 
 const API_URL = process.env.REACT_APP_API_URL;
@@ -68,7 +68,7 @@ function TodoList({ username, onLogout }) {
     return (
         <div className="flex flex-col h-full bg-gray-50 dark:bg-gray-800">
             {/* Header: Sticky at top so it's always visible */}
-            <div className='grid grid-cols-3 items-center p-6 bg-white border-b border-gray-100 dark:bg-gray-800 dark:border-gray-700 shadow-sm transition-colors duration-300'>
+            <div className='grid grid-cols-3 items-center p-6 bg-white border-b border-gray-100 dark:bg-gray-600 dark:border-gray-700 shadow-sm transition-colors duration-300'>
                 <div className='justify-self-start'>
                 </div>
                 <div className='justify-self-center'>

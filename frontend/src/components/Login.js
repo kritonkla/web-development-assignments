@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-// Using a placeholder image for the logo required in the lab
 const CEI_LOGO_URL = "https://cei.kmitl.ac.th/wp-content/uploads/2024/09/cropped-ceip-fav-1.png"; 
 
 const API_URL = process.env.REACT_APP_API_URL;
