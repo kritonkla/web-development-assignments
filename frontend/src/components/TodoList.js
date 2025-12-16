@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaTrash, FaCheck, FaSignOutAlt, FaPlus } from 'react-icons/fa'; // React Icons
+import { FaTrash, FaCheck, FaSignOutAlt, FaPlus, FaClipboardList, FaCoffee} from 'react-icons/fa'; // React Icons
 
 const CEI_LOGO_URL = "https://cei.kmitl.ac.th/wp-content/uploads/2024/09/cropped-ceip-fav-1.png"; 
 const API_URL = process.env.REACT_APP_API_URL;
@@ -66,28 +66,36 @@ function TodoList({ username, onLogout }) {
     };
 
     return (
-        <div className="flex flex-col h-full bg-gray-50">
+        <div className="flex flex-col h-full bg-gray-50 dark:bg-gray-800">
             {/* Header: Sticky at top so it's always visible */}
-            <div className="flex justify-between items-center p-6 bg-white border-b border-gray-100">
-                <img src={CEI_LOGO_URL} alt="CEi" className="h-8" />
-                <button 
-                    onClick={() => { localStorage.removeItem('todo_username'); onLogout(); }} 
-                    className="text-gray-400 hover:text-red-500 transition-colors"
-                >
-                    <FaSignOutAlt size={20} />
-                </button>
+            <div className='grid grid-cols-3 items-center p-6 bg-white border-b border-gray-100 dark:bg-gray-800 dark:border-gray-700 shadow-sm transition-colors duration-300'>
+                <div className='justify-self-start'>
+                </div>
+                <div className='justify-self-center'>
+                    <img src={CEI_LOGO_URL} alt="CEi" className='h-7'/>
+                </div>
+                <div className='justify-self-end flex items-center gap-3'>
+                    <button
+                        onClick={() => { localStorage.removeItem('todo_username'); onLogout(); }}
+                        className="p-2 rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 transition-all"
+                        aria-label='Logout'
+                    >
+                        <FaSignOutAlt size={20}/>
+                    </button>
+                </div>
             </div>
+
 
             {/* Input Area */}
             <div className="p-6 pb-2">
-                <h1 className="text-2xl font-bold text-gray-800 mb-4">
+                <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
                     My Tasks
                 </h1>
                 <form onSubmit={handleAddTodo} className="relative">
                     <input
                         type="text"
                         placeholder="Add a new task..."
-                        className="w-full p-4 pr-14 rounded-2xl border-none shadow-sm bg-white focus:ring-2 focus:ring-blue-500 outline-none"
+                        className="w-full p-4 pr-14 rounded-2xl border-none shadow-sm bg-white dark:bg-gray-600 focus:ring-2 focus:ring-blue-500 outline-none"
                         value={newTask}
                         onChange={(e) => setNewTask(e.target.value)}
                     />
@@ -108,7 +116,7 @@ function TodoList({ username, onLogout }) {
                     <div 
                         key={todo.id} 
                         className={`group p-4 rounded-2xl border transition-all duration-200 flex items-center justify-between
-                            ${todo.done ? 'bg-gray-50 border-transparent' : 'bg-white border-gray-100 shadow-sm'}
+                            ${todo.done ? 'bg-gray-50 border-transparent dark:bg-gray-600' : 'bg-white dark:bg-gray-600 border-gray-100 dark:border-gray-400 shadow-sm'}
                         `}
                     >
                         <div className="flex items-center gap-4 overflow-hidden">
@@ -124,7 +132,7 @@ function TodoList({ username, onLogout }) {
                             
                             <div className="flex flex-col min-w-0">
                                 {/* truncate: Adds '...' if text is too long for mobile screen */}
-                                <span className={`font-medium text-sm truncate ${todo.done ? 'line-through text-gray-400' : 'text-gray-700'}`}>
+                                <span className={`font-medium text-sm truncate ${todo.done ? 'line-through text-gray-400' : 'text-gray-700 dark:text-white'}`}>
                                     {todo.task}
                                 </span>
                                 <span className="text-[10px] text-gray-400 mt-0.5">
@@ -144,8 +152,19 @@ function TodoList({ username, onLogout }) {
                 ))}
                 
                 {todos.length === 0 && (
-                    <div className="text-center text-gray-400 mt-10 text-sm">
-                        No tasks yet. Enjoy your day!
+                    <div className="flex flex-col items-center justify-center mt-12 mb-12 text-center">
+                        <div className='bg-blue-50 p-6 rounded-full mb-4 shadow-sm'>
+                            <FaClipboardList className='text-blue-300 w-16 h-16 dark:invert'/>
+                        </div>
+
+                        <h3 className='text-xl font-bold text-gray-700 dark:text-white mb-2'>
+                            All caught up!
+                        </h3>
+
+                        <p className='text-gray-400 max-w-[200px] text-sm flex items-center justify-center gap-2'>
+                            Time to relax <FaCoffee className='text-yellow-500'/>  
+                        </p>
+
                     </div>
                 )}
             </div>

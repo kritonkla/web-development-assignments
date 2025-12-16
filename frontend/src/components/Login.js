@@ -44,8 +44,8 @@ function Login({ onLogin }) {
                <img src={CEI_LOGO_URL} alt="CEi Logo" className="h-12 object-contain" />
             </div>
             
-            <h2 className="text-3xl font-extrabold text-gray-800 mb-2 text-center">Welcome</h2>
-            <p className="text-gray-500 text-center mb-8">Sign in to manage your tasks</p>
+            <h2 className="text-3xl font-extrabold text-gray-800 dark:text-white mb-2 text-center transition-colors delay-200">Welcome</h2>
+            <p className="text-gray-500 dark:text-gray-200 text-center mb-8 transition-colors duration-300">Sign in to manage your tasks</p>
             
             <form onSubmit={handleSubmit} className="flex flex-col gap-6">
                 {/* Input Field Styling */}
@@ -53,7 +53,7 @@ function Login({ onLogin }) {
                 <input
                     type="text"
                     placeholder="Enter your username"
-                    className="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                    className="w-full p-4 bg-gray-50 border border-gray-200 dark:bg-gray-700 dark:text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-700 transition-all"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                 />
@@ -63,7 +63,7 @@ function Login({ onLogin }) {
                 {/* active:scale-95: "Click" animation feedback for mobile users */}
                 <button 
                     type="submit"
-                    className="w-full bg-blue-600 text-white p-4 rounded-2xl font-bold text-lg hover:bg-blue-700 active:scale-95 transition-all duration-200 shadow-lg shadow-blue-500/30"
+                    className="w-full bg-blue-600 dark:bg-blue-700 text-white p-4 rounded-2xl font-bold text-lg hover:bg-blue-700 dark:hover:bg-blue-800 active:scale-95 transition-all duration-200 shadow-lg shadow-blue-500/30 dark:shadow-blue-700/30"
                 >
                     Get Started
                 </button>
