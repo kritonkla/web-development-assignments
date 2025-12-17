@@ -40,22 +40,6 @@ function TodoList({ username, onLogout }) {
         } catch (err) { console.error(err); }
     };
 
-    const handleToggleDone = async (id, currentDoneStatus) => {
-        const newDoneStatus = !currentDoneStatus;
-        try {
-            const response = await fetch(`${API_URL}/todos/${id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ done: newDoneStatus }),
-            });
-            if (response.ok) {
-                setTodos(todos.map(todo => 
-                    todo.id === id ? { ...todo, done: newDoneStatus } : todo
-                ));
-            }
-        } catch (err) { console.error(err); }
-    };
-
     const handleToggleStatus = async(id, CurrentStatus) => {
         const nextStatus = getNextStatus(CurrentStatus);
         try {
