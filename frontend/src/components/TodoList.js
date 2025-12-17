@@ -56,6 +56,29 @@ function TodoList({ username, onLogout }) {
         } catch (err) { console.error(err); }
     };
 
+    const handleToggleStatus = async(id, CurrentStatus) => {
+        const nextStatus = getNextStatus(CurrentStatus);
+        try {
+            const response = await fetch(`${API_URL}/todos/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'applicaTion/json'},
+                body: JSON.stringify({done: nextStatus}),
+            });
+            if (response.ok) {
+                setTodos(todos.map(todo =>
+                    todo.id === id ? {...todo, done: nextStatus} : todo
+                ));
+            }
+        } catch (err) {console.error(err); }
+    }
+
+    const getNextStatus = (CurrentStatus) => {
+        const status = Number(CurrentStatus);
+        if (status === 0) return 2;
+        if (status === 2) return 1;
+        return 0;
+    }
+
     const handleDeleteTodo = async (id) => {
         try {
             const response = await fetch(`${API_URL}/todos/${id}`, { method: 'DELETE' });
@@ -120,19 +143,23 @@ function TodoList({ username, onLogout }) {
                         `}
                     >
                         <div className="flex items-center gap-4 overflow-hidden">
-                            {/* Custom Checkbox Button */}
-                            <button 
-                                onClick={() => handleToggleDone(todo.id, todo.done)}
-                                className={`flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors 
-                                    ${todo.done ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300 text-transparent hover:border-green-500'}
-                                `}
-                            >
-                                <FaCheck size={10} />
+                            <button
+                                onClick={() => handleToggleStatus(todo.id,todo.done)}
+                                className={`flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors
+                                    ${todo.done === 1 ? 'bg-green-500 border-green-500 text-white' : ''}
+                                    ${todo.done === 2 ? 'bg-yellow-400 border-yellow-400 text-white' : ''}
+                                    ${todo.done === 0 ? 'border-gray-300 dark:border-gray-600 text-transparent hover:border-green-500' : ''}
+                                    `}
+                                >
+                                    {todo.done === 1 && <FaCheck size={10} />}
+                                    {todo.done === 2 && <span className='animate-pulse text-[8px]'>•••</span>}
+
                             </button>
+
                             
                             <div className="flex flex-col min-w-0">
                                 {/* truncate: Adds '...' if text is too long for mobile screen */}
-                                <span className={`font-medium text-sm truncate ${todo.done ? 'line-through text-gray-400' : 'text-gray-700 dark:text-white'}`}>
+                                <span className={`font-medium text-sm truncate ${todo.done === 1 ? 'line-through text-gray-400' : 'text-gray-700 dark:text-white'}`}>
                                     {todo.task}
                                 </span>
                                 <span className="text-[10px] text-gray-400 mt-0.5">
