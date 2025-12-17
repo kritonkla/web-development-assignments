@@ -132,7 +132,7 @@ function TodoList({ username, onLogout }) {
                                 className={`flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors
                                     ${todo.done === 1 ? 'bg-green-500 border-green-500 text-white' : ''}
                                     ${todo.done === 2 ? 'bg-yellow-400 border-yellow-400 text-white' : ''}
-                                    ${todo.done === 0 ? 'border-gray-300 dark:border-gray-600 text-transparent hover:border-green-500' : ''}
+                                    ${todo.done === 0 ? 'border-gray-300 dark:white text-transparent hover:border-green-500' : ''}
                                     `}
                                 >
                                     {todo.done === 1 && <FaCheck size={10} />}
