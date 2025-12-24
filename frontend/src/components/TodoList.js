@@ -95,7 +95,7 @@ function TodoList({ username, onLogout }) {
                     <input
                         type="text"
                         placeholder="Add a new task..."
-                        className="w-full p-4 pr-14 rounded-2xl border-none shadow-sm bg-white dark:bg-gray-600 focus:ring-2 focus:ring-blue-500 outline-none"
+                        className="w-full p-4 pr-14 rounded-2xl border-none shadow-sm bg-white dark:bg-gray-600 focus:ring-2 focus:ring-blue-500 outline-none dark:text-white"
                         value={newTask}
                         onChange={(e) => setNewTask(e.target.value)}
                     />
