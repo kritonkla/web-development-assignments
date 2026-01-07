@@ -44,7 +44,7 @@ app.post('/api/login', (req, res) => {
         message: 'Login successful', 
         user: { username: username }
     });
-});s
+});
 
 // ------------------------------------
 // API: Todo List (CRUD Operations)

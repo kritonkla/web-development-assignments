@@ -54,12 +54,6 @@ function TodoList({ username, onLogout }) {
         return true;
     });
 
-    const sortedTodos = filteredTodos.sort((a,b) => {
-        if(!a.target_date) return 1;
-        if(!b.target_date) return -1;
-        return new Date(b.target_date) - Date(a.target_date);
-    });
-
     const handleToggleStatus = async(id, CurrentStatus) => {
         const nextStatus = getNextStatus(CurrentStatus);
         try {
@@ -165,7 +159,7 @@ function TodoList({ username, onLogout }) {
             {/* Scrollable List */}
             {/* flex-1 overflow-y-auto: Takes remaining height and scrolls internally */}
             <div className="flex-1 overflow-y-auto px-6 pb-6 space-y-3">
-                {sortedTodos.map(todo => (
+                {filteredTodos.map(todo => (
                     <div 
                         key={todo.id} 
                         className={`group p-4 rounded-2xl border transition-all duration-200 flex items-center justify-between
@@ -211,7 +205,7 @@ function TodoList({ username, onLogout }) {
                     </div>
                 ))}
                 
-                {todos.length === 0 && (
+                {filteredTodos.length === 0 && (
                     <div className="flex flex-col items-center justify-center mt-12 mb-12 text-center">
                         <div className='bg-blue-50 p-6 rounded-full mb-4 shadow-sm'>
                             <FaClipboardList className='text-blue-300 w-16 h-16 dark:invert'/>
