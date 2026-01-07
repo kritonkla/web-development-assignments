@@ -62,16 +62,16 @@ app.get('/api/todos/:username', (req, res) => {
 
 // 2. CREATE: Add a new todo item
 app.post('/api/todos', (req, res) => {
-    const { username, task } = req.body;
+    const { username, task, target_date } = req.body;
     if (!username || !task) {
         return res.status(400).send({ message: 'Username and task are required' });
     }
     // Note: 'done' defaults to FALSE in the DB schema
-    const sql = 'INSERT INTO todo (username, task) VALUES (?, ?)';
-    db.query(sql, [username, task], (err, result) => {
+    const sql = 'INSERT INTO todo (username, task, target_date) VALUES (?, ?, ?)';
+    db.query(sql, [username, task, target_date], (err, result) => {
         if (err) return res.status(500).send(err);
         // Return the created item details including the new ID
-        res.status(201).send({ id: result.insertId, username, task, done: 0, updated: new Date() });
+        res.status(201).send({ id: result.insertId, username, task, target_date, done: 0, updated: new Date() });
     });
 });
 

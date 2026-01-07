@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaTrash, FaCheck, FaSignOutAlt, FaPlus, FaClipboardList, FaCoffee} from 'react-icons/fa';
+import { FaTrash, FaCheck, FaSignOutAlt, FaPlus, FaClipboardList, FaCoffee, FaCalendarAlt} from 'react-icons/fa';
 
 const CEI_LOGO_URL = "https://cei.kmitl.ac.th/wp-content/uploads/2024/09/cropped-ceip-fav-1.png"; 
 const API_URL = process.env.REACT_APP_API_URL;
@@ -7,6 +7,8 @@ const API_URL = process.env.REACT_APP_API_URL;
 function TodoList({ username, onLogout }) {
     const [todos, setTodos] = useState([]);
     const [newTask, setNewTask] = useState('');
+    const [newTargetDate, setNewTargetDate] = useState('');
+    const [activeTab, setActiveTab] = useState('todo')
 
     useEffect(() => {
         fetchTodos();
@@ -30,7 +32,7 @@ function TodoList({ username, onLogout }) {
             const response = await fetch(`${API_URL}/todos`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, task: newTask }),
+                body: JSON.stringify({ username, task: newTask, target_date: newTargetDate || null }),
             });
             if (response.ok) {
                 const newTodo = await response.json();
@@ -39,6 +41,21 @@ function TodoList({ username, onLogout }) {
             }
         } catch (err) { console.error(err); }
     };
+
+    const filteredTodos = todos.filter(todo => {
+        const status = Number(todo.done);
+        if (activeTab === 'todo') return status === 0;
+        if (activeTab === 'doing') return status === 2;
+        if (activeTab === 'done') return status === 1;
+        return true;
+    });
+
+    const sortedTodos = filteredTodos.sort((a,b) => {
+        if(!a.target_date) return 1;
+        if(!b.target_date) return -1;
+        console.log("Sorting:", a.target_date, typeof a.target_date);
+        return new Date(b.target_date) - Date(a.target_date);
+    });
 
     const handleToggleStatus = async(id, CurrentStatus) => {
         const nextStatus = getNextStatus(CurrentStatus);
@@ -113,13 +130,39 @@ function TodoList({ username, onLogout }) {
                     >
                         <FaPlus />
                     </button>
+                    <div className='flex items-center gap-2 bg-white dark:bg-gray-800 p-2 rounded-xl shadow-sm w-fit px-4'>
+                        <FaCalendarAlt className='text-gray-400'/>
+                        <input
+                            type="datetime-local"
+                            className='bg-transparent text-sm text-gray-600 dark:text-gray-300 outline-none'
+                            value={newTargetDate}
+                            onChange={(e) => setNewTargetDate(e.target.value)}
+                        />
+                    </div>
                 </form>
+            </div>
+
+            <div className='flex px-6 gap-2 mt-2'>
+                {['todo','doing','done'].map((tab) => (
+                    <button
+                        key={tab}
+                        onClick={() => setActiveTab(tab)}
+                        className={`flex-1 py-2 rounded-lg text-sm font-bold capitalize transition-all ${
+                            activeTab === tab
+                            ? 'bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300 shadow-sm'
+                            : 'text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
+                            }`}         
+                    >
+                        {tab}
+                    </button>
+                ))}
+                
             </div>
 
             {/* Scrollable List */}
             {/* flex-1 overflow-y-auto: Takes remaining height and scrolls internally */}
             <div className="flex-1 overflow-y-auto px-6 pb-6 space-y-3">
-                {todos.map(todo => (
+                {sortedTodos.map(todo => (
                     <div 
                         key={todo.id} 
                         className={`group p-4 rounded-2xl border transition-all duration-200 flex items-center justify-between
@@ -149,6 +192,9 @@ function TodoList({ username, onLogout }) {
                                 <span className="text-[10px] text-gray-400 mt-0.5">
                                     {new Date(todo.updated).toLocaleString()}
                                 </span>
+                                <span className="text-[10px] text-gray-400 mt-0.5">
+                                    Target: {new Date(todo.target_date).toLocaleString()}
+                                </span> 
                             </div>
                         </div>
 
