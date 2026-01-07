@@ -53,7 +53,7 @@ app.post('/api/login', (req, res) => {
 // 1. READ: Get all todos for a specific user
 app.get('/api/todos/:username', (req, res) => {
     const { username } = req.params;
-    const sql = 'SELECT id, task, done, updated FROM todo WHERE username = ? ORDER BY id DESC';
+    const sql = 'SELECT id, task, done, updated, target_date FROM todo WHERE username = ? ORDER BY TIMEDIFF(target_date, NOW()) DESC';
     db.query(sql, [username], (err, results) => {
         if (err) return res.status(500).send(err);
         res.json(results);
