@@ -116,7 +116,7 @@ function TodoList({ username, onLogout }) {
                     <input
                         type="text"
                         placeholder="Add a new task..."
-                        className="w-full p-4 pr-14 rounded-2xl border-none shadow-sm bg-white dark:bg-gray-600 focus:ring-2 focus:ring-blue-500 outline-none"
+                        className="w-full p-4 pr-14 rounded-2xl border-none shadow-sm bg-white dark:bg-gray-600 focus:ring-2 focus:ring-blue-500 outline-none mb-4"
                         value={newTask}
                         onChange={(e) => setNewTask(e.target.value)}
                     />
@@ -127,7 +127,7 @@ function TodoList({ username, onLogout }) {
                     >
                         <FaPlus />
                     </button>
-                    <div className='flex items-center gap-2 bg-white dark:bg-gray-800 p-2 rounded-xl shadow-sm w-fit px-4'>
+                    <div className='flex items-center gap-2 bg-white dark:bg-gray-600 p-2 rounded-xl shadow-sm w-fit px-4'>
                         <FaCalendarAlt className='text-gray-400'/>
                         <input
                             type="datetime-local"
@@ -162,7 +162,7 @@ function TodoList({ username, onLogout }) {
                 {filteredTodos.map(todo => (
                     <div 
                         key={todo.id} 
-                        className={`group p-4 rounded-2xl border transition-all duration-200 flex items-center justify-between
+                        className={`group p-4 rounded-2xl border transition-all duration-200 flex items-center justify-between mt-4
                             ${todo.done ? 'bg-gray-50 border-transparent dark:bg-gray-600' : 'bg-white dark:bg-gray-600 border-gray-100 dark:border-gray-400 shadow-sm'}
                         `}
                     >
