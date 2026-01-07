@@ -44,7 +44,7 @@ app.post('/api/login', (req, res) => {
         message: 'Login successful', 
         user: { username: username }
     });
-});
+});s
 
 // ------------------------------------
 // API: Todo List (CRUD Operations)
@@ -53,25 +53,25 @@ app.post('/api/login', (req, res) => {
 // 1. READ: Get all todos for a specific user
 app.get('/api/todos/:username', (req, res) => {
     const { username } = req.params;
-    const sql = 'SELECT id, task, done, updated FROM todo WHERE username = ? ORDER BY id DESC';
+    const sql = 'SELECT id, task, done, target_date, updated FROM todo WHERE username = ? ORDER BY id DESC';
     db.query(sql, [username], (err, results) => {
         if (err) return res.status(500).send(err);
-        res.json(results);
+            res.json(results);
     });
 });
 
 // 2. CREATE: Add a new todo item
 app.post('/api/todos', (req, res) => {
-    const { username, task } = req.body;
+    const { username, task, target_date } = req.body;
     if (!username || !task) {
         return res.status(400).send({ message: 'Username and task are required' });
     }
     // Note: 'done' defaults to FALSE in the DB schema
-    const sql = 'INSERT INTO todo (username, task) VALUES (?, ?)';
-    db.query(sql, [username, task], (err, result) => {
+    const sql = 'INSERT INTO todo (username, task, target_date) VALUES (?, ?, ?)';
+    db.query(sql, [username, task, target_date], (err, result) => {
         if (err) return res.status(500).send(err);
         // Return the created item details including the new ID
-        res.status(201).send({ id: result.insertId, username, task, done: 0, updated: new Date() });
+        res.status(201).send({ id: result.insertId, username, task, target_date, done: 0, updated: new Date() });
     });
 });
 
