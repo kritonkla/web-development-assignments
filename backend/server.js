@@ -44,7 +44,7 @@ app.post('/api/login', (req, res) => {
         message: 'Login successful', 
         user: { username: username }
     });
-});
+});s
 
 // ------------------------------------
 // API: Todo List (CRUD Operations)
@@ -56,7 +56,7 @@ app.get('/api/todos/:username', (req, res) => {
     const sql = 'SELECT id, task, done, updated, target_date FROM todo WHERE username = ? ORDER BY TIMEDIFF(target_date, NOW()) DESC';
     db.query(sql, [username], (err, results) => {
         if (err) return res.status(500).send(err);
-        res.json(results);
+            res.json(results);
     });
 });
 

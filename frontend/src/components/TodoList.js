@@ -20,6 +20,10 @@ function TodoList({ username, onLogout }) {
             const response = await fetch(`${API_URL}/todos/${username}`);
             if (response.ok) {
                 const data = await response.json();
+                console.log("Database data:",response)
+                if (data.length>0) {
+                    console.log("First Task Keys:", Object.keys(data[0]));
+                }
                 setTodos(data);
             }
         } catch (err) { console.error(err); }
@@ -53,7 +57,6 @@ function TodoList({ username, onLogout }) {
     const sortedTodos = filteredTodos.sort((a,b) => {
         if(!a.target_date) return 1;
         if(!b.target_date) return -1;
-        console.log("Sorting:", a.target_date, typeof a.target_date);
         return new Date(b.target_date) - Date(a.target_date);
     });
 
