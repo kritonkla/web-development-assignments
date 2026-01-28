@@ -65,7 +65,7 @@ function App() {
                             />
                         ) : (
                             <Signup 
-                                onLogin={handleLogin} // Optional: if signup auto-logs them in
+                                onLogin={handleLogin}
                                 // Pass function to switch back to Login
                                 onSwitchToLogin={() => setAuthView('login')} 
                             />
