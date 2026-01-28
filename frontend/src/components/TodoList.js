@@ -94,7 +94,7 @@ const fetchTodos = async () => {
             <div className='grid grid-cols-3 items-center p-6 bg-white border-b border-gray-100 dark:bg-gray-600 dark:border-gray-700 shadow-sm transition-colors duration-300'>
                 <div className='justify-self-start ml-12'>
                         <img 
-                            src={userAvatar}
+                            src={userAvatar || "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"}  
                             referrerPolicy="no-referrer"
                             alt="Profile" 
                             className="w-10 h-10 rounded-full border-2 border-blue-500 shadow-sm"

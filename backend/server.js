@@ -101,6 +101,9 @@ app.get('/auth/google/callback',
   }
 );
 
+app.get('/api/health', (req, res) => {
+    return res.status(200).send({message : 'API OK'})
+})
 // ------------------------------------
 // API: Authentication 
 // ------------------------------------
