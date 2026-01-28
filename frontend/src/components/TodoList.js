@@ -4,18 +4,18 @@ import { FaTrash, FaCheck, FaSignOutAlt, FaPlus, FaClipboardList, FaCoffee, FaCa
 const CEI_LOGO_URL = "https://cei.kmitl.ac.th/wp-content/uploads/2024/09/cropped-ceip-fav-1.png"; 
 const API_URL = process.env.REACT_APP_API_URL;
 
-function TodoList({ username, onLogout }) {
+function TodoList({ username, onLogout}) {
     const [todos, setTodos] = useState([]);
     const [newTask, setNewTask] = useState('');
     const [newTargetDate, setNewTargetDate] = useState('');
     const [activeTab, setActiveTab] = useState('todo')
+    const [userAvatar, setUserAvatar] = useState('');
 
     useEffect(() => {
         fetchTodos();
         // eslint-disable-next-line
     }, [username]);
-
-    const fetchTodos = async () => {
+const fetchTodos = async () => {
         try {
             const response = await fetch(`${API_URL}/todos/${username}`);
             if (response.ok) {
@@ -24,6 +24,7 @@ function TodoList({ username, onLogout }) {
                 if (data.length>0) {
                     console.log("First Task Keys:", Object.keys(data[0]));
                 }
+                setUserAvatar(data[0].PICTURE_URL)
                 setTodos(data);
             }
         } catch (err) { console.error(err); }
@@ -91,7 +92,13 @@ function TodoList({ username, onLogout }) {
         <div className="flex flex-col h-full bg-gray-50 dark:bg-gray-800">
             {/* Header: Sticky at top so it's always visible */}
             <div className='grid grid-cols-3 items-center p-6 bg-white border-b border-gray-100 dark:bg-gray-600 dark:border-gray-700 shadow-sm transition-colors duration-300'>
-                <div className='justify-self-start'>
+                <div className='justify-self-start ml-12'>
+                        <img 
+                            src={userAvatar}
+                            referrerPolicy="no-referrer"
+                            alt="Profile" 
+                            className="w-10 h-10 rounded-full border-2 border-blue-500 shadow-sm"
+                        />
                 </div>
                 <div className='justify-self-center'>
                     <img src={CEI_LOGO_URL} alt="CEi" className='h-7'/>

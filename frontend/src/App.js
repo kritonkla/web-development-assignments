@@ -4,12 +4,25 @@ import TodoList from './components/TodoList';
 import Signup from './components/Signup';
 import { FaSun, FaMoon } from 'react-icons/fa';
 
+
 function App() {
     const [currentUser, setCurrentUser] = useState(null);
     const [darkMode, setDarkMode] = useState(false);
     
     // New state to toggle between Login and Signup
     const [authView, setAuthView] = useState('login'); // Options: 'login' or 'signup'
+
+    useEffect(() => {
+        const queryParams =  new URLSearchParams(window.location.search);
+        const googleUser = queryParams.get('username');
+
+        if (googleUser) {
+            const decodedUser = decodeURIComponent(googleUser);
+            setCurrentUser(googleUser);
+            localStorage.setItem('todo_username', decodedUser);
+            window.history.replaceState({},document.title,"/");
+        }
+    },[]);
 
     useEffect(() => {
         const storedUser = localStorage.getItem('todo_username');
