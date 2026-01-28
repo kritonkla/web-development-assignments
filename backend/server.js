@@ -1,11 +1,11 @@
 // server.js
 require('dotenv').config();
+const bcrypt = require('bcrypt');
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
 
 const app = express();
-const port = 5001;
 
 // Middleware setup
 app.use(cors()); // Allow cross-origin requests from React frontend
@@ -28,23 +28,92 @@ db.connect(err => {
 });
 
 // ------------------------------------
-// API: Authentication (Username Only)
+// API: Authentication 
 // ------------------------------------
 app.post('/api/login', (req, res) => {
-    // In this simplified system, we grant "login" access if a username is provided.
-    // WARNING: This is highly insecure and should not be used in a real-world app.
-    const { username } = req.body;
-    if (!username) {
-        return res.status(400).send({ message: 'Username is required' });
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+        return res.status(400).send({ message: 'Username and password are required' });
     }
+
+    // 1. Find the user in the database
+    const sql = 'SELECT * FROM todo WHERE username = ?';
     
-    // Success response includes the username
-    res.send({ 
-        success: true, 
-        message: 'Login successful', 
-        user: { username: username }
+    db.query(sql, [username], async (err, results) => {
+        if (err) return res.status(500).send(err);
+
+        // If no user found with that username
+        if (results.length === 0) {
+            return res.status(401).send({ message: 'Invalid username or password' });
+        }
+
+        const user = results[0];
+
+        // 2. Compare the provided password with the stored hash
+        const isMatch = await bcrypt.compare(password, user.password);
+
+        if (isMatch) {
+            res.send({ 
+                success: true, 
+                message: 'Login successful', 
+                user: { username: user.username, email: user.email }
+            });
+        } else {
+            res.status(401).send({ message: 'Invalid username or password' });
+        }
     });
 });
+
+app.post('/api/signup', async (req, res) => {
+    const { username, email, password } = req.body;
+
+    if (!username || !password) {
+        return res.status(400).send({ message: 'Username and password are required' });
+    }
+
+    // 1. CHECK: Does the user exist?
+    const checkSQL = 'SELECT * FROM todo WHERE username = ?';
+    
+    db.query(checkSQL, [username], async (err, results) => {
+        // Handle DB connection errors
+        if (err) {
+            console.error(err);
+            return res.status(500).send({ message: "Database Error" });
+        }
+
+        // 2. STOP: If results found, return immediately
+        if (results.length > 0) {
+            return res.status(409).send({
+                success: false,
+                message: "Username already exists!"
+            });
+        }
+
+        // 3. PROCEED: Only runs if results.length === 0
+        // We move the entire Hashing + Insert block INSIDE this  query callback
+        try {
+            const hashedPass = await bcrypt.hash(password, 10);
+            const insertSQL = 'INSERT INTO todo (username, email, password) VALUES (?, ?, ?)';
+
+            db.query(insertSQL, [username, email, hashedPass], (err, result) => {
+                if (err) {
+                    console.error(err);
+                    return res.status(500).send({ message: "Error registering user" });
+                }
+                
+                res.status(201).send({
+                    success: true,
+                    message: 'User registered successfully'
+                });
+            });
+        } catch (error) {
+            console.error(error);
+            res.status(500).send({ message: 'Error hashing password' });
+        }
+    });
+});
+
 
 // ------------------------------------
 // API: Todo List (CRUD Operations)
@@ -104,6 +173,6 @@ app.delete('/api/todos/:id', (req, res) => {
 });
 
 // Start the server
-app.listen(port, () => {
-    console.log(`Server listening at http://localhost:${port}`);
+app.listen(process.env.SERVER_PORT, () => {
+    console.log(`Server listening at http://localhost:${process.env.SERVER_PORT}`);
 });

@@ -47,6 +47,7 @@ function TodoList({ username, onLogout }) {
     };
 
     const filteredTodos = todos.filter(todo => {
+        if (!todo.task) return false;
         const status = Number(todo.done);
         if (activeTab === 'todo') return status === 0;
         if (activeTab === 'doing') return status === 2;

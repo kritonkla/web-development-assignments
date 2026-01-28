@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 const CEI_LOGO_URL = "https://cei.kmitl.ac.th/wp-content/uploads/2024/09/cropped-ceip-fav-1.png"; 
 
 const API_URL = process.env.REACT_APP_API_URL;
+const SITE_KEY = process.env.REACT_APP_SITE_KEY;
 
-function Login({ onLogin, onSwitchToSignup }) {
+function Signup({ onLogin, onSwitchToLogin }) {
     const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [captchaToken, setCaptchaToken] = useState(null);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -16,12 +20,25 @@ function Login({ onLogin, onSwitchToSignup }) {
             setError('Please enter a username.');
             return;
         }
+        if (!email.trim()) {
+            setError('Please enter an email.');
+            return;
+        }
+        if (!password.trim()) {
+            setError('Please enter a password.');
+            return;
+        }
+        if (!captchaToken) {
+            setError('Please verify that you are not a robot.');
+            return;
+        }
+
 
         try {
-            const response = await fetch(`${API_URL}/login`, {
+            const response = await fetch(`${API_URL}/signup`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password }),
+                body: JSON.stringify({ username, email, password }),
             });
             const data = await response.json();
             
@@ -59,12 +76,24 @@ function Login({ onLogin, onSwitchToSignup }) {
                 />
                 <input
                     type="text"
+                    placeholder="Enter your email"
+                    className="w-full p-4 bg-gray-50 border border-gray-200 dark:bg-gray-700 dark:text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-700 transition-all"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                />
+                <input
+                    type="text"
                     placeholder="Enter your password"
                     className="w-full p-4 bg-gray-50 border border-gray-200 dark:bg-gray-700 dark:text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-700 transition-all"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                 />
-                
+                <div className='flex justify-center'>
+                    <ReCAPTCHA
+                        sitekey={SITE_KEY}
+                        onChange={(token => setCaptchaToken(token))}
+                    />
+                </div>
                 {/* Button Styling */}
                 {/* hover:bg-blue-700: Visual feedback for mouse users */}
                 {/* active:scale-95: "Click" animation feedback for mobile users */}
@@ -75,15 +104,14 @@ function Login({ onLogin, onSwitchToSignup }) {
                     Get Started
                 </button>
             </form>
-
         <div className="mt-4 text-center">
-        <p className="text-gray-500">Don't have an account?</p>
+        <p className="text-gray-500">Already have an account?</p>
         <button 
-          type = "button"
-          onClick={onSwitchToSignup} 
+          type='button'
+          onClick={onSwitchToLogin} 
           className="text-blue-500 hover:underline font-semibold"
         >
-          Sign Up
+          Log In
         </button>
       </div>
             
@@ -96,4 +124,4 @@ function Login({ onLogin, onSwitchToSignup }) {
     );
 }
 
-export default Login;
+export default Signup;
