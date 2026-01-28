@@ -4,12 +4,14 @@ const bcrypt = require('bcrypt');
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
+const {OAuth2Client} = require('google-auth-library');
 
 const app = express();
 
 // Middleware setup
 app.use(cors()); // Allow cross-origin requests from React frontend
 app.use(express.json()); // Enable reading JSON data from request body
+app.use(express.urlencoded({ extended: true })); // Enable reading URL-encoded data
 
 // --- MySQL Connection Setup ---
 const db = mysql.createConnection({
@@ -18,6 +20,8 @@ const db = mysql.createConnection({
     password: process.env.DB_PASSWORD, // CHANGE THIS to your MySQL password
     database: process.env.DB_NAME // Ensure this matches your database name
 });
+
+const client = new OAuth2Client();
 
 db.connect(err => {
     if (err) {
@@ -31,6 +35,45 @@ db.connect(err => {
 // API: Authentication 
 // ------------------------------------
 app.post('/api/login', (req, res) => {
+    if (req.header('Content-Type') === 'application/x-www-form-urlencoded') { // Sign-in with google
+        const ticket = client.verifyIdToken({
+            idToken: req.body.token,
+            audience: process.env.GOOGLE_CLIENT_ID
+        }).then(async (ticket) => {
+            const payload = ticket.getPayload();
+            const username = payload['name'];
+            const email = payload['email'];
+            
+            const sql = 'SELECT * FROM todo WHERE username = ?';
+
+            db.query(sql, [username], async (err, results) => {
+                if (err) return res.status(500).send(err);
+
+                // If no user found with that username, create one
+                if (results.length === 0) {
+                    const insertSQL = 'INSERT INTO todo (username, email) VALUES (?, ?)';
+                    db.query(insertSQL, [username, email], (err, result) => {
+                        if (err) {
+                            console.error(err);
+                            return res.status(500).send({ message: "Error registering user" });
+                        }
+                    });
+
+                    
+                }
+                res.send({ 
+                    success: true, 
+                    message: 'Login successful', 
+                    user: { username: username, email: email }
+                });
+            });
+
+        }).catch(err => {
+            return res.status(401).send({ message: 'Invalid Google token' });
+        });
+        return;
+    }
+
     const { username, password } = req.body;
 
     if (!username || !password) {
