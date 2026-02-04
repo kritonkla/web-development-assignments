@@ -4,18 +4,18 @@ import { FaTrash, FaCheck, FaSignOutAlt, FaPlus, FaClipboardList, FaCoffee, FaCa
 const CEI_LOGO_URL = "https://cei.kmitl.ac.th/wp-content/uploads/2024/09/cropped-ceip-fav-1.png"; 
 const API_URL = process.env.REACT_APP_API_URL;
 
-function TodoList({ username, onLogout }) {
+function TodoList({ username, onLogout}) {
     const [todos, setTodos] = useState([]);
     const [newTask, setNewTask] = useState('');
     const [newTargetDate, setNewTargetDate] = useState('');
     const [activeTab, setActiveTab] = useState('todo')
+    const [userAvatar, setUserAvatar] = useState('');
 
     useEffect(() => {
         fetchTodos();
         // eslint-disable-next-line
     }, [username]);
-
-    const fetchTodos = async () => {
+const fetchTodos = async () => {
         try {
             const response = await fetch(`${API_URL}/todos/${username}`);
             if (response.ok) {
@@ -23,11 +23,24 @@ function TodoList({ username, onLogout }) {
                 console.log("Database data:",response)
                 if (data.length>0) {
                     console.log("First Task Keys:", Object.keys(data[0]));
+                    setUserAvatar(data[0].profile_url);
                 }
+                fetchProfilePic();
                 setTodos(data);
             }
         } catch (err) { console.error(err); }
     };
+
+const fetchProfilePic = async () => {
+    try {
+        const response = await fetch(`${API_URL}/get-pic/${username}`);
+        if (response.ok) {
+            const pic_url = await response.json();
+            console.log("picture url: ", pic_url[0].profile_url);
+            setUserAvatar(pic_url[0].profile_url)
+        }
+    } catch (err) {console.error(err)}
+};
 
     const handleAddTodo = async (e) => {
         e.preventDefault();
@@ -36,7 +49,7 @@ function TodoList({ username, onLogout }) {
             const response = await fetch(`${API_URL}/todos`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, task: newTask, target_date: newTargetDate || null }),
+                body: JSON.stringify({ username, name: newTask, target_date: newTargetDate || null }),
             });
             if (response.ok) {
                 const newTodo = await response.json();
@@ -47,7 +60,8 @@ function TodoList({ username, onLogout }) {
     };
 
     const filteredTodos = todos.filter(todo => {
-        const status = Number(todo.done);
+        if (!todo.name) return false;
+        const status = Number(todo.status);
         if (activeTab === 'todo') return status === 0;
         if (activeTab === 'doing') return status === 2;
         if (activeTab === 'done') return status === 1;
@@ -60,11 +74,11 @@ function TodoList({ username, onLogout }) {
             const response = await fetch(`${API_URL}/todos/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'applicaTion/json'},
-                body: JSON.stringify({done: nextStatus}),
+                body: JSON.stringify({status: nextStatus}),
             });
             if (response.ok) {
                 setTodos(todos.map(todo =>
-                    todo.id === id ? {...todo, done: nextStatus} : todo
+                    todo.id === id ? {...todo, status: nextStatus} : todo
                 ));
             }
         } catch (err) {console.error(err); }
@@ -90,7 +104,13 @@ function TodoList({ username, onLogout }) {
         <div className="flex flex-col h-full bg-gray-50 dark:bg-gray-800">
             {/* Header: Sticky at top so it's always visible */}
             <div className='grid grid-cols-3 items-center p-6 bg-white border-b border-gray-100 dark:bg-gray-600 dark:border-gray-700 shadow-sm transition-colors duration-300'>
-                <div className='justify-self-start'>
+                <div className='justify-self-start ml-12'>
+                        <img 
+                            src={userAvatar || "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"}  
+                            referrerPolicy="no-referrer"
+                            alt="Profile" 
+                            className="w-10 h-10 rounded-full border-2 border-blue-500 shadow-sm"
+                        />
                 </div>
                 <div className='justify-self-center'>
                     <img src={CEI_LOGO_URL} alt="CEi" className='h-7'/>
@@ -163,28 +183,28 @@ function TodoList({ username, onLogout }) {
                     <div 
                         key={todo.id} 
                         className={`group p-4 rounded-2xl border transition-all duration-200 flex items-center justify-between mt-4
-                            ${todo.done ? 'bg-gray-50 border-transparent dark:bg-gray-600' : 'bg-white dark:bg-gray-600 border-gray-100 dark:border-gray-400 shadow-sm'}
+                            ${todo.status ? 'bg-gray-50 border-transparent dark:bg-gray-600' : 'bg-white dark:bg-gray-600 border-gray-100 dark:border-gray-400 shadow-sm'}
                         `}
                     >
                         <div className="flex items-center gap-4 overflow-hidden">
                             <button
-                                onClick={() => handleToggleStatus(todo.id,todo.done)}
+                                onClick={() => handleToggleStatus(todo.id,todo.status)}
                                 className={`flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors
-                                    ${todo.done === 1 ? 'bg-green-500 border-green-500 text-white' : ''}
-                                    ${todo.done === 2 ? 'bg-yellow-400 border-yellow-400 text-white' : ''}
-                                    ${todo.done === 0 ? 'border-gray-300 dark:white text-transparent hover:border-green-500' : ''}
+                                    ${todo.status === 1 ? 'bg-green-500 border-green-500 text-white' : ''}
+                                    ${todo.status === 2 ? 'bg-yellow-400 border-yellow-400 text-white' : ''}
+                                    ${todo.status === 0 ? 'border-gray-300 dark:white text-transparent hover:border-green-500' : ''}
                                     `}
                                 >
-                                    {todo.done === 1 && <FaCheck size={10} />}
-                                    {todo.done === 2 && <span className='animate-pulse text-[8px]'>•••</span>}
+                                    {todo.status === 1 && <FaCheck size={10} />}
+                                    {todo.status === 2 && <span className='animate-pulse text-[8px]'>•••</span>}
 
                             </button>
 
                             
                             <div className="flex flex-col min-w-0">
                                 {/* truncate: Adds '...' if text is too long for mobile screen */}
-                                <span className={`font-medium text-sm truncate ${todo.done === 1 ? 'line-through text-gray-400' : 'text-gray-700 dark:text-white'}`}>
-                                    {todo.task}
+                                <span className={`font-medium text-sm truncate ${todo.status === 1 ? 'line-through text-gray-400' : 'text-gray-700 dark:text-white'}`}>
+                                    {todo.name}
                                 </span>
                                 <span className="text-[10px] text-gray-400 mt-0.5">
                                     {new Date(todo.updated).toLocaleString()}
