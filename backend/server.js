@@ -202,16 +202,35 @@ app.post('/api/signup', async (req, res) => {
 
 // 2. CREATE: Add a new todo item
 app.post('/api/todos', (req, res) => {
-    const { username, task, target_date } = req.body;
-    if (!username || !task) {
+    const { username, name, target_date } = req.body;
+    if (!username || !name) {
         return res.status(400).send({ message: 'Username and task are required' });
     }
-    // Note: 'done' defaults to FALSE in the DB schema
-    const sql = 'INSERT INTO todo (username, task, target_date) VALUES (?, ?, ?)';
-    db.query(sql, [username, task, target_date], (err, result) => {
+
+    const sql1 = 'SELECT id from users where username = ?'
+    db.query(sql1, [username], (err,result) => {
         if (err) return res.status(500).send(err);
-        // Return the created item details including the new ID
-        res.status(201).send({ id: result.insertId, username, task, target_date, done: 0, updated: new Date() });
+
+        if(result.length===0) {
+            return res.status(404).send({message: "User not found"});
+        }
+
+        const user_id = result[0].id;
+        console.log(user_id);
+
+        const sql2 = 'INSERT INTO tasks (name,updated,target_date,status,assigned_id) VALUE (?, NOW(), ?, 0, ?)'
+        db.query(sql2, [name,target_date,user_id], (err,result) => {
+            if (err) return res.status(500).send(err);
+            res.status(201).send(
+                {
+                    id: result.insertId,
+                    name: name,
+                    target_date: target_date,
+                    status: 0,
+                    assigned_id : user_id
+                }
+            );
+        });
     });
 });
 
@@ -296,7 +315,7 @@ app.post('/api/team/create', (req, res) => {
                 return res.status(500).send(err);
             }
 
-            res.send({
+            res.status(201).send({
                 success: true,
                 message: 'Team created and admin added successfully',
                 team_name: team_name,
