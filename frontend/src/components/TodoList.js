@@ -112,7 +112,7 @@ const fetchProfilePic = async () => {
                             className="w-10 h-10 rounded-full border-2 border-blue-500 shadow-sm"
                         />
                 <span className=''>
-                    <p className='text-pretty text-[12px]'>{localStorage.getItem('todo_username')}</p>
+                    <p className='text-pretty text-[12px] dark:text-white'>{localStorage.getItem('todo_username')}</p>
                 </span>
                 </div>
                 <div className='justify-self-center'>

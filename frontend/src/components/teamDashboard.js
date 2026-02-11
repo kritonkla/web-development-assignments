@@ -193,7 +193,7 @@ function TeamDashboard({ user, team, onBack }) {
                 <div className="flex flex-wrap gap-2">
                     {members.map(mem => (
                         <div key={mem.id} className="flex items-center gap-2 bg-white dark:bg-gray-600 px-3 py-1 rounded-full shadow-sm border">
-                            <img src={mem.profile_url || "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"} alt="avatar" className="w-6 h-6 rounded-full" />
+                            <img src={mem.profile_url || "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"} alt="avatar" referrerPolicy="no-referrer" className="w-6 h-6 rounded-full" />
                             <span className="text-sm dark:text-white">{mem.username}</span>
                             {isAdmin && mem.id !== user.id && (
                                 <button onClick={() => handleRemoveMember(mem.id)} className="text-red-400 hover:text-red-600 ml-1">
