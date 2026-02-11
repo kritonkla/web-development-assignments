@@ -59,7 +59,7 @@ passport.use(new GoogleStrategy({
     callbackURL: "http://localhost:5001/auth/google/callback"
 },
 function(accessToken, refreshToken, profile, done) {
-    const fullname = (profile.name.givenName) + (profile.name.familyName)
+    const fullname = (profile.name.givenName) + ' ' + (profile.name.familyName);
     const email = profile.emails[0].value;
     const username = profile.displayName;
     const photo = profile.photos && profile.photos.length > 0 ? profile.photos[0].value : null;
