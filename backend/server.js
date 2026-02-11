@@ -217,7 +217,6 @@ app.post('/api/todos', (req, res) => {
         }
 
         const user_id = result[0].id;
-        console.log(user_id);
 
         const sql2 = 'INSERT INTO tasks (name,updated,target_date,status,assigned_id) VALUE (?, NOW(), ?, 0, ?)'
         db.query(sql2, [name,target_date,user_id], (err,result) => {
@@ -227,6 +226,7 @@ app.post('/api/todos', (req, res) => {
                     id: result.insertId,
                     name: name,
                     target_date: target_date,
+                    updated: new Date(),
                     status: 0,
                     assigned_id : user_id
                 }
