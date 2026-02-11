@@ -137,7 +137,7 @@ app.post('/api/login', (req, res) => {
             res.send({ 
                 success: true, 
                 message: 'Login successful', 
-                user: { username: user.username, email: user.email }
+                user: {id: user.id, username: user.username, email: user.email }
             });
         } else {
             res.status(401).send({ message: 'Invalid username or password' });
@@ -184,7 +184,8 @@ app.post('/api/signup', async (req, res) => {
                 
                 res.status(201).send({
                     success: true,
-                    message: 'User registered successfully'
+                    message: 'User registered successfully',
+                    user: { id: result.insertId, username: username, email: email }
                 });
             });
         } catch (error) {
@@ -216,7 +217,6 @@ app.post('/api/todos', (req, res) => {
         }
 
         const user_id = result[0].id;
-        console.log(user_id);
 
         const sql2 = 'INSERT INTO tasks (name,updated,target_date,status,assigned_id) VALUE (?, NOW(), ?, 0, ?)'
         db.query(sql2, [name,target_date,user_id], (err,result) => {
@@ -226,6 +226,7 @@ app.post('/api/todos', (req, res) => {
                     id: result.insertId,
                     name: name,
                     target_date: target_date,
+                    updated: new Date(),
                     status: 0,
                     assigned_id : user_id
                 }
@@ -304,7 +305,7 @@ app.post('/api/team/create', (req, res) => {
         if (err) return res.status(500).send(err);
 
         // CAPTURE THE NEW TEAM ID
-        // The 'result' object contains 'insertId', which is the ID of the row you just created
+        // The 'result' object contains 'insertId', which is the ID of the row just created
         const newTeamId = result.insertId;
 
         // Query 2: Add the Admin to the user_team table
@@ -410,6 +411,37 @@ app.get('/api/todos/:username', (req, res) => {
     });
 });
 
+// 7. Get All Members of a specific Team (for Admin to list or assign tasks)
+app.get('/api/team/:teamid/members', (req, res) => {
+    const { teamid } = req.params;
+    const sql = `
+        SELECT users.id, users.username, users.profile_url 
+        FROM user_team 
+        JOIN users ON user_team.user_id = users.id 
+        WHERE user_team.team_id = ?`;
+    
+    db.query(sql, [teamid], (err, results) => {
+        if (err) return res.status(500).send(err);
+        res.json(results);
+    });
+});
+
+// 8. Get All Tasks for a specific Team (User & Admin view)
+app.get('/api/team/:teamid/tasks', (req, res) => {
+    const { teamid } = req.params;
+    const sql = `
+        SELECT tasks.*, users.username as assignee_name, users.profile_url as assignee_pic 
+        FROM tasks 
+        LEFT JOIN users ON tasks.assigned_id = users.id 
+        WHERE tasks.team_id = ? 
+        ORDER BY target_date ASC`;
+        
+    db.query(sql, [teamid], (err, results) => {
+        if (err) return res.status(500).send(err);
+        res.json(results);
+    });
+});
+
 app.get('/api/get-pic/:username', (req,res) => {
     const {username} = req.params;
     const retrieve_pic_sql = 'SELECT profile_url FROM users WHERE username = ?;';
@@ -419,7 +451,6 @@ app.get('/api/get-pic/:username', (req,res) => {
     });
 });
 
-// Start the server
 app.listen(process.env.SERVER_PORT, () => {
     console.log(`Server listening at http://localhost:${process.env.SERVER_PORT}`);
 });
