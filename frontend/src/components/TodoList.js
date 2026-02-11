@@ -111,6 +111,9 @@ const fetchProfilePic = async () => {
                             alt="Profile" 
                             className="w-10 h-10 rounded-full border-2 border-blue-500 shadow-sm"
                         />
+                <div className='justify-self-center ml-3'>
+                    <p className='text-pretty text-[12px]'>{localStorage.getItem('todo_username')}</p>
+                </div>
                 </div>
                 <div className='justify-self-center'>
                     <img src={CEI_LOGO_URL} alt="CEi" className='h-7'/>
